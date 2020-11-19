@@ -30,6 +30,7 @@ namespace SearchApp
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 
             services.AddTransient<ISearchResultRepository, SearchResultRepository>();
+            services.AddTransient<DataManager>();
             services.AddControllersWithViews();
         }
 

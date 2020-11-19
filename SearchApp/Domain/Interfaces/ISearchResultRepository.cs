@@ -9,5 +9,7 @@ namespace SearchApp.Domain.Interfaces
     public interface ISearchResultRepository
     {
         IQueryable<SearchResult> GetSearchResults();
+
+        void SaveSearchResult(SearchResult searchResult);
     }
 }

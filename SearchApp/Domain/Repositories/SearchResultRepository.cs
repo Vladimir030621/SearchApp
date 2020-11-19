@@ -20,5 +20,11 @@ namespace SearchApp.Domain.Repositories
         {
             return context.SearchResults;
         }
+
+        public void SaveSearchResult(SearchResult searchResult)
+        {
+            context.SearchResults.Add(searchResult);
+            context.SaveChanges();
+        }
     }
 }
