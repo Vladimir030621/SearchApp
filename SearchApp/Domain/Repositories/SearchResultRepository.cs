@@ -16,7 +16,7 @@ namespace SearchApp.Domain.Repositories
             this.context = context;
         }
 
-        public IQueryable<SearchResult> GetSearchResults()
+        public IEnumerable<SearchResult> GetSearchResults()
         {
             return context.SearchResults;
         }

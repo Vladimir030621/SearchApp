@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SearchApp.Domain;
+using SearchApp.Domain.Interfaces;
 using SearchApp.Models;
 using System;
 using System.Collections.Generic;
@@ -16,57 +17,76 @@ namespace SearchApp.Controllers
         private const string SEARCH_ENGINE_ID_CX = "41743ddc9baced361";
         private const string API_KEY = "AIzaSyBnMYeWT5A4RE3TQ_DRsCBhkzPirAj-vUI";
 
-        private DataManager dataManager;
+        //private readonly DataManager dataManager;
+        private readonly ISearchResultRepository context;
 
-        public HomeController(DataManager dataManager)
+        public HomeController(ISearchResultRepository searchResultRepository)
         {
-            this.dataManager = dataManager;
+            context = searchResultRepository;
         }
 
-        public ActionResult Index()
+        public IActionResult Index()
         {
-            return View();
+            return View("Index");
         }
+
 
         [HttpPost]
-        public ActionResult ShowResults(string search)
+        public IActionResult ShowResults(string searchingInput)
         {
-            string searchQuery = search;
-            var results = new List<SearchResult>();
-            int numberOfSelectedResults = 10;
+            List<SearchResult> results = new List<SearchResult>();
 
-            if (dataManager.SearchResults.GetSearchResults().Any(s => s.SearchingInput == search))
+            if (string.IsNullOrWhiteSpace(searchingInput))
             {
-                results = dataManager.SearchResults.GetSearchResults().Where(s => s.SearchingInput == search).ToList();
+                throw new ArgumentNullException("SearchInput is null", nameof(searchingInput));
+            }
+
+            string searchQuery = searchingInput;
+
+            if (context.GetSearchResults().Any(s => s.SearchingInput == searchingInput))
+            {
+                results = context.GetSearchResults().Where(s => s.SearchingInput == searchingInput).ToList();
             }
             else
             {
                 var request = WebRequest.Create("https://www.googleapis.com/customsearch/v1?key=" + API_KEY + "&cx=" + SEARCH_ENGINE_ID_CX + "&q=" + searchQuery);
 
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
+                results = RequestResultsDeserialize(request, searchingInput);
 
-                string responseString = reader.ReadToEnd();
-                dynamic jsonData = JsonConvert.DeserializeObject(responseString);
-
-                for(int i = 0; i < numberOfSelectedResults; i++)
+                int numberOfSelectedResults = 10;
+                for (int i = 0; i < numberOfSelectedResults; i++)
                 {
-                    SearchResult currentResult = new SearchResult
-                    {
-                        Title = jsonData.items[i].title,
-                        Link = jsonData.items[i].link,
-                        Snippet = jsonData.items[i].snippet,
-                        SearchingInput = search
-                    };
-
-                    results.Add(currentResult);
-
-                    dataManager.SearchResults.SaveSearchResult(currentResult);
+                    context.SaveSearchResult(results[i]);
                 }
             }
 
             return View(results);
+        }
+
+
+        private List<SearchResult> RequestResultsDeserialize(WebRequest request, string searchingInput)
+        {
+            List<SearchResult> results = new List<SearchResult>();
+
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            Stream dataStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(dataStream);
+
+            string responseString = reader.ReadToEnd();
+            dynamic jsonData = JsonConvert.DeserializeObject(responseString);
+
+            foreach(var item in jsonData.items)
+            {
+                results.Add(new SearchResult
+                {
+                    Title = item.title,
+                    Link = item.link,
+                    Snippet = item.snippet,
+                    SearchingInput = searchingInput
+                });
+            }
+
+            return results;
         }
     }
 }
