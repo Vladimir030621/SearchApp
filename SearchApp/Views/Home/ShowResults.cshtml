@@ -4,14 +4,13 @@
 @{Html.RenderPartial("Index");}
 
 
-<ul>
+<ul style="margin-top: 30px;">
     @foreach (var item in Model)
     {
         <li style="width:500px">
             <a href="@item.Link" style="color:blue">@item.Title</a><br />
             <span style="font-size:15px; color:green">@item.Link</span><br />
-            <span style="color:grey;">@item.Snippet</span>
+            <span style="color:grey;">@item.Snippet</span><br />
         </li>
     }
-
 </ul>

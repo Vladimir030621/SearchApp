@@ -70,7 +70,6 @@ namespace SearchApp.Tests
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsType<List<SearchResult>>(viewResult.ViewData.Model);
             Assert.Equal(numberOfSelectedResults, model.Count());
-
             foreach(var item in model)
             {
                 mock.Verify(r => r.SaveSearchResult(item));

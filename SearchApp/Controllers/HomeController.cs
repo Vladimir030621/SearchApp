@@ -63,7 +63,6 @@ namespace SearchApp.Controllers
             return View(results);
         }
 
-
         private List<SearchResult> RequestResultsDeserialize(WebRequest request, string searchingInput)
         {
             List<SearchResult> results = new List<SearchResult>();
