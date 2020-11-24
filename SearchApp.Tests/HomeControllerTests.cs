@@ -14,6 +14,7 @@ namespace SearchApp.Tests
 {
     public class HomeControllerTests
     {
+        /// <summary> Mocks </summary>
         private IEnumerable<SearchResult> GetTestResults()
         {
             var searchResults = new List<SearchResult>
@@ -28,6 +29,8 @@ namespace SearchApp.Tests
             return searchResults;
         }
 
+
+        #region Index Tests
         [Fact]
         public void IndexReturnsView()
         {
@@ -39,8 +42,9 @@ namespace SearchApp.Tests
 
             var viewResult = Assert.IsType<ViewResult>(result);
         }
+        #endregion
 
-
+        #region ShowResults Tests
         [Fact]
         public void ShowResultsReturnsDataFromDB()
         {
@@ -75,5 +79,7 @@ namespace SearchApp.Tests
                 mock.Verify(r => r.SaveSearchResult(item));
             }          
         }
+
+        #endregion
     }
 }

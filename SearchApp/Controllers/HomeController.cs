@@ -17,7 +17,6 @@ namespace SearchApp.Controllers
         private const string SEARCH_ENGINE_ID_CX = "41743ddc9baced361";
         private const string API_KEY = "AIzaSyBnMYeWT5A4RE3TQ_DRsCBhkzPirAj-vUI";
 
-        //private readonly DataManager dataManager;
         private readonly ISearchResultRepository context;
 
         public HomeController(ISearchResultRepository searchResultRepository)
@@ -63,6 +62,12 @@ namespace SearchApp.Controllers
             return View(results);
         }
 
+
+        #region Json deserializer
+        /// <summary>
+        /// Json deserializer
+        /// </summary>
+
         private List<SearchResult> RequestResultsDeserialize(WebRequest request, string searchingInput)
         {
             List<SearchResult> results = new List<SearchResult>();
@@ -87,5 +92,7 @@ namespace SearchApp.Controllers
 
             return results;
         }
+
+        #endregion
     }
 }
